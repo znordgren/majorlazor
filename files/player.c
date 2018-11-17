@@ -4,7 +4,7 @@
 #include "uart.h"
 #include "player.h"
 
-extern char stats[100];
+char stats[100];
 
 void takeDamage(Player* p) {
 	p->health -= 5;

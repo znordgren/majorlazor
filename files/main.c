@@ -113,16 +113,12 @@ void LED_Out(unsigned int value) {
 	}
 } */
 
-int waitForGame(void) {
-}
-
 int main (void) {
 	//char test[12];
-	char msg[30];
 	int i;
+	Player thisPlayer;
 	UARTInit(0, 9600);
 	
-	Player thisPlayer;
 	pInit(&thisPlayer);
 	sendStats(&thisPlayer);
 	takeDamage(&thisPlayer);
