@@ -10,6 +10,9 @@
 //CHANGE UART2 MENTIONS TO 0 AND VICE VERSA
 //USING 2 FOR MODULE, 0 FOR OUTPUTTING RESPONSES
 
+Player thisPlayer;
+Game thisGame;
+
 extern volatile uint32_t UART0_Count;
 extern volatile uint8_t UART0_Buffer[BUFSIZE];
 extern volatile uint32_t UART2_Count;
@@ -88,41 +91,29 @@ void LED_Out(unsigned int value) {
 /*----------------------------------------------------------------------------
   SysTick IRQ: Executed periodically
  *----------------------------------------------------------------------------*/
-/* void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
+void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
 {           
   static unsigned long ticks;
-  static unsigned int leds = 7;
 
   // (1) Set clock_1s to 1 every 1 second;
   if (ticks++ >= 99) { 
     ticks    = 0;
-//		secs 		+= 1;
-    clock_1s = 1;
+		if(thisGame.status == 1)
+			waiting();
   }
 
-  // (2) Blink the LEDs depending on ADC_ConvertedValue;
-  if (clock_1s && mk == 1) {
-    if(leds == 0) leds = 7;
-    LED_Out(leds);
-		leds--;
-		clock_1s = 0;
-  } else if (clock_1s && mk == 2) {
-		if(leds == 7) leds = 0;
-    LED_Out(leds);
-		leds++;
-		clock_1s = 0;
-	}
-} */
+} 
 
 int main (void) {
 	//char test[12];
-  Player thisPlayer;
-	Game thisGame;
 	
 	UARTInit(0, 9600);
 	LCD_Initialization();
 	LCD_Clear(White);
-	thisGame.status = 0;
+	SysTick_Config(SystemCoreClock/100);
+	
+	gInit(&thisGame);
+	pInit(&thisPlayer);
 	updateList();
 	
 	while(1) {
@@ -131,15 +122,12 @@ int main (void) {
 				 waiting for app user to press "New Game"
 				 when that happens, update list of games on screen 
 				 wait for user input to select a game and move to status == 1 */
-			
-			
 		} else if(thisGame.status == 1) {
 			/* read in from bluetooth
 				 looking to receive info that the game has started 
 				 when it has, update thisGame.status to 2 */
 		} else /* status == 2 */ {
 			/* handle game logic unrelated to IR interrupts */
-			// test comment
 		}
 	}
 }

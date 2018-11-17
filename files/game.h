@@ -18,6 +18,10 @@ typedef struct Game {
 
 */
 
+void gInit(Game* g);
+
 void joinGame(Game* g);
 
 void updateList(void);
+
+void waiting(void);
