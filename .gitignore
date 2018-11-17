@@ -5,6 +5,10 @@
 *.htm
 *.uvopt
 *.bak
+*.lnp
+*.dep
+JLinkSettings.ini
+JLinkLog.txt
 
 # Prerequisites
 *.d
