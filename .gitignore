@@ -2,6 +2,7 @@
 *.axf
 *.lst
 *.html
+*.htm
 *.uvopt
 *.bak
 
