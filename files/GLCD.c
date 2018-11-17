@@ -1573,4 +1573,11 @@ void LCD_clear_ufo( int x0, int y0, int state) {
 	LCD_draw_block(x0-32, y0, 40, 104, Black);
 }
 
+void LCD_draw_box( int x0, int y0, int w, int h, uint16_t color ) {
+	LCD_draw_line(x0, y0, x0 + w, y0, color);
+	LCD_draw_line(x0, y0, x0, y0 + h, color);
+	LCD_draw_line(x0 + w, y0, x0 + w, y0 + h, color);
+	LCD_draw_line(x0, y0 + h, x0 + w, y0 + h, color);
+}
+
 

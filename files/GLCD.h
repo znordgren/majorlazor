@@ -116,5 +116,6 @@ void LCD_draw_line( int x0, int y0, int x1, int y1, uint16_t color);
 void LCD_draw_smiley_face( int x0, int y0, int radius, uint16_t color);
 void LCD_draw_snake( int nX, int nY, int oX, int oY );
 void LCD_draw_mouse( int mX, int mY );
+void LCD_draw_box ( int x0, int y0, int w, int h, uint16_t color );
 
 #endif 

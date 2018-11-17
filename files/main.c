@@ -5,6 +5,7 @@
 #include "LED.h"                                /* LED function prototypes */
 #include "uart.h"
 #include "player.h"
+#include "game.h"
 
 //CHANGE UART2 MENTIONS TO 0 AND VICE VERSA
 //USING 2 FOR MODULE, 0 FOR OUTPUTTING RESPONSES
@@ -115,21 +116,29 @@ void LED_Out(unsigned int value) {
 
 int main (void) {
 	//char test[12];
-	int i;
-	Player thisPlayer;
+  Player thisPlayer;
+	Game thisGame;
+	
 	UARTInit(0, 9600);
+	LCD_Initialization();
+	LCD_Clear(White);
+	thisGame.status = 0;
+	updateList();
 	
-	pInit(&thisPlayer);
-	sendStats(&thisPlayer);
-	takeDamage(&thisPlayer);
-	sendStats(&thisPlayer);
-	fire(&thisPlayer);
-	sendStats(&thisPlayer);
-	
-	for(i = 0; i < 15; i++) 
-		fire(&thisPlayer);
-	
-	sendStats(&thisPlayer);
-	reload(&thisPlayer);
-	sendStats(&thisPlayer);
+	while(1) {
+		if(thisGame.status == 0) {
+			/* display list of games on screen
+				 waiting for app user to press "New Game"
+				 when that happens, update list of games on screen 
+				 wait for user input to select a game and move to status == 1 */
+			
+			
+		} else if(thisGame.status == 1) {
+			/* read in from bluetooth
+				 looking to receive info that the game has started 
+				 when it has, update thisGame.status to 2 */
+		} else /* status == 2 */ {
+			/* handle game logic unrelated to IR interrupts */
+		}
+	}
 }

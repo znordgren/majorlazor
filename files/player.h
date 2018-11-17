@@ -1,3 +1,8 @@
+#include <LPC17xx.H>                            /* LPC17xx definitions */
+#include <stdio.h>
+#include <string.h>
+#include "uart.h"
+
 typedef struct Player {
 	int health;
 	int lives;
