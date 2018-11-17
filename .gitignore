@@ -1,4 +1,6 @@
 *.crf
+*.axf
+*.lst
 
 # Prerequisites
 *.d
