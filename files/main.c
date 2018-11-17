@@ -139,6 +139,7 @@ int main (void) {
 				 when it has, update thisGame.status to 2 */
 		} else /* status == 2 */ {
 			/* handle game logic unrelated to IR interrupts */
+			// test comment
 		}
 	}
 }
