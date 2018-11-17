@@ -4,6 +4,7 @@
 #include "GLCD.h"                               /* GLCD function prototypes */
 #include "LED.h"                                /* LED function prototypes */
 #include "uart.h"
+#include "player.h"
 
 //CHANGE UART2 MENTIONS TO 0 AND VICE VERSA
 //USING 2 FOR MODULE, 0 FOR OUTPUTTING RESPONSES
@@ -13,19 +14,8 @@ extern volatile uint8_t UART0_Buffer[BUFSIZE];
 extern volatile uint32_t UART2_Count;
 extern volatile uint8_t UART2_Buffer[BUFSIZE];
 
-const int DEBUG = 0;
-
-char message[500];
-
 const unsigned long led_mask2[] = { 1UL<<0, 1UL<<1, 1UL<<2, 1UL<<3,
                                  1UL<<4, 1UL<<5, 1UL<<6, 1UL<<7 };
-
-int mk;
-unsigned char clock_1s;
-
-uint16_t hnum[30];
-
-unsigned int val_Tx = 0, val_Rx = 0;
 
 volatile uint32_t temp;
 void delay( uint32_t del)
@@ -123,38 +113,27 @@ void LED_Out(unsigned int value) {
 	}
 } */
 
+int waitForGame(void) {
+}
+
 int main (void) {
 	//char test[12];
 	char msg[30];
-	uint32_t value;
-	uint32_t oldVal;
-	uint32_t count;
-	
-	SystemInit();
-	LED_init();
-	
-	LCD_Initialization();
-	LCD_Clear(White);
-	UARTInit(2, 9600);
+	int i;
 	UARTInit(0, 9600);
 	
-	//
-		
-	//sendHTTPResponse(10, test, 12);
-	//sendCommand("AT\r\n", 7);
-	/*sendCommand("AT+GMR\r\n", 10);
-	delay( 1 << 26 );
-	sendCommand("AT+CWMODE=1\r\n", 15);
-	delay( 1 << 27 );
-	sendCommand("AT+CWLAP\r\n", 12);*/
+	Player thisPlayer;
+	pInit(&thisPlayer);
+	sendStats(&thisPlayer);
+	takeDamage(&thisPlayer);
+	sendStats(&thisPlayer);
+	fire(&thisPlayer);
+	sendStats(&thisPlayer);
 	
+	for(i = 0; i < 15; i++) 
+		fire(&thisPlayer);
 	
-	while(1) {
-		if(UART2_Count != 0) {
-			LPC_UART2->IER = IER_THRE | IER_RLS; // Disable RBR
-			UARTSend(0, (uint8_t *)(UART2_Buffer), UART2_Count );
-			UART2_Count = 0;
-			LPC_UART2->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
-		}
-	}
+	sendStats(&thisPlayer);
+	reload(&thisPlayer);
+	sendStats(&thisPlayer);
 }
