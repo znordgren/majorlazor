@@ -1,3 +1,5 @@
+*.crf
+
 # Prerequisites
 *.d
 
