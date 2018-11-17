@@ -1,6 +1,7 @@
 *.crf
 *.axf
 *.lst
+*.html
 
 # Prerequisites
 *.d
