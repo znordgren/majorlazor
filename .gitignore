@@ -9,7 +9,6 @@
 *.dep
 JLinkSettings.ini
 JLinkLog.txt
-*.uvproj
 *.ssss
 
 # Prerequisites
