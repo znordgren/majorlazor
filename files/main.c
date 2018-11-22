@@ -4,11 +4,7 @@
 #include "GLCD.h"                               /* GLCD function prototypes */
 #include "LED.h"                                /* LED function prototypes */
 #include "uart.h"
-#include "player.h"
 #include "game.h"
-
-//CHANGE UART2 MENTIONS TO 0 AND VICE VERSA
-//USING 2 FOR MODULE, 0 FOR OUTPUTTING RESPONSES
 
 Player thisPlayer;
 Game thisGame;
@@ -17,9 +13,6 @@ extern volatile uint32_t UART0_Count;
 extern volatile uint8_t UART0_Buffer[BUFSIZE];
 extern volatile uint32_t UART2_Count;
 extern volatile uint8_t UART2_Buffer[BUFSIZE];
-
-const unsigned long led_mask2[] = { 1UL<<0, 1UL<<1, 1UL<<2, 1UL<<3,
-                                 1UL<<4, 1UL<<5, 1UL<<6, 1UL<<7 };
 
 volatile uint32_t temp;
 void delay( uint32_t del)
@@ -39,8 +32,6 @@ void displayResponse() {
 	}
 } */
 
-
-
 /*void search(char *msg, int size) {
 	int i;
 	char mg[3];
@@ -59,35 +50,7 @@ void displayResponse() {
 	sprintf(mg, "r:%d", mk);
 	GLCD_DisplayString(3, 0, mg);
 } */
-/*----------------------------------------------------------------------------
-  Function that turns on requested LED
- *----------------------------------------------------------------------------*/
-void LED_On (unsigned int num) {
 
-  LPC_GPIO2->FIOSET |= led_mask2[num];
-}
-
-/*----------------------------------------------------------------------------
-  Function that turns off requested LED
- *----------------------------------------------------------------------------*/
-void LED_Off (unsigned int num) {
-
-  LPC_GPIO2->FIOCLR |= led_mask2[num];
-}
-/*----------------------------------------------------------------------------
-  Function that outputs value to LEDs
- *----------------------------------------------------------------------------*/
-void LED_Out(unsigned int value) {
-  int i;
-
-  for (i = 0; i < LED_NUM; i++) {
-    if (value == i) {
-      LED_On (i);
-    } else {
-      LED_Off(i);
-    }
-  }
-}
 /*----------------------------------------------------------------------------
   SysTick IRQ: Executed periodically
  *----------------------------------------------------------------------------*/
@@ -98,8 +61,14 @@ void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
   // (1) Set clock_1s to 1 every 1 second;
   if (ticks++ >= 99) { 
     ticks    = 0;
-		if(thisGame.status == 1)
-			waiting();
+		switch(thisGame.status) {
+			case 0:
+				updateList();
+				break;
+			case 1:
+				waiting();
+				break;
+		}
   }
 
 } 
@@ -111,11 +80,12 @@ int main (void) {
 	LCD_Initialization();
 	LCD_Clear(White);
 	SysTick_Config(SystemCoreClock/100);
-	
-	gInit(&thisGame);
-	pInit(&thisPlayer);
-	updateList();
-	
+	gInit(&thisGame, &thisPlayer);
+	addGame("test game", "1/8");
+	addGame("test game2", "2/8");
+	addGame("test game3", "3/8");
+	addGame("test game4", "4/8");
+
 	while(1) {
 		if(thisGame.status == 0) {
 			/* display list of games on screen

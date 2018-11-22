@@ -10,7 +10,7 @@ void takeDamage(Player* p) {
 }
 
 void fire(Player* p) {
-	if(p->ammo > 0) {
+	if(p->ammo > 0 && p->health > 0) {
 		p->ammo--;
 		//send out IR signal
 	}

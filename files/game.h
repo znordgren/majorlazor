@@ -4,11 +4,16 @@
 #include "uart.h"
 #include "GLCD.h"
 #include "type.h"
+#include "player.h"
 
 typedef struct Game {
 	int status;
 } Game;
 
+typedef struct GameInfo {
+	char* name;
+	char* players;
+} GameInfo;
 /* 
 
 	status
@@ -18,9 +23,11 @@ typedef struct Game {
 
 */
 
-void gInit(Game* g);
+void gInit(Game* g, Player* p);
 
 void joinGame(Game* g);
+
+void addGame(char* name, char* players);
 
 void updateList(void);
 
