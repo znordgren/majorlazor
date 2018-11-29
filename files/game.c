@@ -3,6 +3,7 @@
 int waitCount;
 int gameCount;
 GameInfo list[4];
+char info[50];
 
 void gInit(Game* g, Player* p) {
 	int i;
@@ -47,6 +48,20 @@ void updateList() {
 		LCD_PutText(50, y, (uint8_t *) list[i].name, Black, White);
 		LCD_PutText(50, y + 20, (uint8_t *) list[i].players, Black, White);
 	}
+}
+
+void updateDisplay(Player* p) {
+	LCD_Clear(White);
+	LCD_PutText(100, 45, (uint8_t *) "Player Info", Black, White);
+	memset(info, 0, 50);
+	sprintf(info, "Health: %d", p->health);
+	LCD_PutText(100, 65, (uint8_t *) info, Black, White);
+	memset(info, 0, 50);
+	sprintf(info, "Ammo: %d", p->ammo);
+	LCD_PutText(100, 85, (uint8_t *) info, Black, White);
+	memset(info, 0, 50);
+	sprintf(info, "Lives: %d", p->lives);
+	LCD_PutText(100, 105, (uint8_t *) info, Black, White);
 }
 
 void waiting() {

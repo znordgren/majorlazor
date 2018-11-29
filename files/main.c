@@ -1,4 +1,10 @@
+//CHANGE THE thisGame.status == 2 LINE TO CHANGE/SEE THE DIFFERENT GAME STATES
+// 0 : LOBBY
+// 1 : WAITING FOR GAME TO START
+// 2 : GAME IN PROGRESS
+
 #include <LPC17xx.H>                            /* LPC17xx definitions */
+#include "LPC17xx.H"
 #include <stdio.h>
 #include <string.h>
 #include "GLCD.h"                               /* GLCD function prototypes */
@@ -8,6 +14,9 @@
 
 Player thisPlayer;
 Game thisGame;
+int toFire;
+int toReload;
+int toDamage;
 
 extern volatile uint32_t UART0_Count;
 extern volatile uint8_t UART0_Buffer[BUFSIZE];
@@ -22,15 +31,18 @@ void delay( uint32_t del)
     temp = i;
 }
 
-/*
-void displayResponse() {
-	if(UART2_Count != 0) {
-			LPC_UART2->IER = IER_THRE | IER_RLS; // Disable RBR
-			UARTSend(0, (uint8_t *)(UART2_Buffer), UART2_Count );
-			UART2_Count = 0;
-			LPC_UART2->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
+
+char displayResponse() {
+	char rtn = 'o';	
+	if(UART0_Count != 0) {
+			LPC_UART0->IER = IER_THRE | IER_RLS; // Disable RBR
+			UARTSend(0, (uint8_t *)(UART0_Buffer), UART0_Count );
+			rtn = UART0_Buffer[0];
+			UART0_Count = 0;
+			LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
 	}
-} */
+	return rtn;
+} 
 
 /*void search(char *msg, int size) {
 	int i;
@@ -51,6 +63,35 @@ void displayResponse() {
 	GLCD_DisplayString(3, 0, mg);
 } */
 
+void testIRQ(void) {
+	char in;
+	
+	if ( (LPC_TIM0->IR & 0x01) == 0x01 && thisGame.status == 2 ) // if MR0 interrupt (this is a sanity check);
+  {		
+		LPC_TIM0->IR |= 1 << 0; // Clear MR0 interrupt flag  
+		//temp way of handling input
+		in = displayResponse();
+		
+		//code to check if Fire button pressed
+		//sets toFire flag to 1
+		if(in == 'a') 
+			toFire = 1;
+		
+		//code to check if Reload button pressed
+		//sets toReload flag to 1
+		//maybe introduce a delay between reloading and firing?
+		if(in == 's')
+			toReload = 1;
+		
+		//code to check if Receiving IR Info
+		//sets toDamage flag to 1
+		if(in == 'd')
+			toDamage = 1;
+		
+		//fire / reload should be if else if so as to only allow one at a time
+	}
+}
+
 /*----------------------------------------------------------------------------
   SysTick IRQ: Executed periodically
  *----------------------------------------------------------------------------*/
@@ -69,22 +110,46 @@ void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
 				waiting();
 				break;
 		}
-  }
+  } else if (thisGame.status == 2 && ticks++ >= 10) {
+		testIRQ();
+		ticks = 0;
+	}
 
 } 
 
 int main (void) {
 	//char test[12];
 	
-	UARTInit(0, 9600);
+	SystemInit();
+	
 	LCD_Initialization();
 	LCD_Clear(White);
 	SysTick_Config(SystemCoreClock/100);
+	UARTInit(0, 9600);
+	UARTSend(0, (uint8_t *) "Made it here", 12);
+	
 	gInit(&thisGame, &thisPlayer);
 	addGame("test game", "1/8");
 	addGame("test game2", "2/8");
 	addGame("test game3", "3/8");
 	addGame("test game4", "4/8");
+	thisGame.status = 2;
+	
+	// (2) Timer 0 configuration;
+  LPC_SC->PCONP |= 1 << 1; // Power up Timer 0 
+  LPC_SC->PCLKSEL0 |= 1 << 2; // Clock for timer = CCLK, i.e., CPU Clock
+  LPC_TIM0->MR0 = 1 << 12; // 24: give a value suitable for the LED blinking 
+                           // frequency based on the clock frequency 
+  LPC_TIM0->MCR |= 1 << 0; // Interrupt on Match 0 compare 
+  LPC_TIM0->MCR |= 1 << 1; // Reset timer on Match 0    
+  LPC_TIM0->TCR |= 1 << 1; // Manually Reset Timer 0 (forced) 
+  LPC_TIM0->TCR &= ~(1 << 1); // Stop resetting the timer 
+	
+	LPC_TIM0->TCR |= 1 << 0; 
+	
+	UARTSend(0, (uint8_t *) "Made it here2", 13);
+	
+  //NVIC_EnableIRQ(TIMER0_IRQn);
 
 	while(1) {
 		if(thisGame.status == 0) {
@@ -97,7 +162,38 @@ int main (void) {
 				 looking to receive info that the game has started 
 				 when it has, update thisGame.status to 2 */
 		} else /* status == 2 */ {
-			/* handle game logic unrelated to IR interrupts */
+		
+			if(toFire) {
+				if(thisPlayer.ammo > 0) {
+					// IR send here
+					thisPlayer.ammo--;
+					updateDisplay(&thisPlayer);
+				}
+				toFire = 0;
+			}
+			
+			if(toReload) {
+				thisPlayer.ammo = 10;
+				toReload = 0;
+				updateDisplay(&thisPlayer);
+			}
+			
+			if(toDamage) {
+				thisPlayer.health -= 5;
+				toDamage = 0;
+				updateDisplay(&thisPlayer);
+			}
+			
+			if(thisPlayer.health == 0) {
+				/* handle death logic here
+					 might want to just end this player's game */
+				thisPlayer.lives--;
+				if(thisPlayer.lives == 0)
+					thisGame.status = 0;
+				else
+					thisPlayer.health = 10;
+			}
+			
 		}
 	}
 }

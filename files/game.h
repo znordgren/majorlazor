@@ -31,4 +31,6 @@ void addGame(char* name, char* players);
 
 void updateList(void);
 
+void updateDisplay(Player* p);
+
 void waiting(void);
