@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Laser Tag</string>
+    <string name="setup">Setup</string>
+    <string name="start_game">Start Game</string>
+    <string name="team_color">Team Color</string>
+    <string name="go_back">Go Back</string>
+    <string name="player_count">Player Count</string>
+    <string name="stats">Stats</string>
+    <string-array name = "colors">
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Black</item>
+        <item>Navy</item>
+        <item>DarkGreen</item>
+        <item>DarkCyan</item>
+        <item>Maroon</item>
+        <item>Purple</item>
+        <item>Olive</item>
+        <item>Grey</item>
+        <item>LightGrey</item>
+        <item>DarkGrey</item>
+        <item>Green</item>
+        <item>Cyan</item>
+        <item>Magenta</item>
+        <item>White</item>
+    </string-array>
+
+    <string-array name = "numPlayers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+</resources>
