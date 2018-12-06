@@ -23,7 +23,7 @@ typedef struct GameInfo {
 
 */
 
-void gInit(Game* g, Player* p);
+void gInit(Game* g);
 
 void joinGame(Game* g);
 

@@ -5,7 +5,7 @@ int gameCount;
 GameInfo list[4];
 char info[50];
 
-void gInit(Game* g, Player* p) {
+void gInit(Game* g) {
 	int i;
 	g->status = 0;
 	waitCount = 0;
@@ -14,7 +14,6 @@ void gInit(Game* g, Player* p) {
 		list[i].name = "No game found";
 		list[i].players = "0/8";
 	}
-	pInit(p);
 } 
 
 void joinGame(Game* g) {

@@ -66,27 +66,45 @@ char displayResponse() {
 void testIRQ(void) {
 	char in;
 	
-	if ( (LPC_TIM0->IR & 0x01) == 0x01 && thisGame.status == 2 ) // if MR0 interrupt (this is a sanity check);
+	if ( (LPC_TIM0->IR & 0x01) == 0x01 ) // if MR0 interrupt (this is a sanity check);
   {		
 		LPC_TIM0->IR |= 1 << 0; // Clear MR0 interrupt flag  
 		//temp way of handling input
 		in = displayResponse();
 		
-		//code to check if Fire button pressed
-		//sets toFire flag to 1
-		if(in == 'a') 
-			toFire = 1;
+		if(thisGame.status == 2) {
+			//code to check if Fire button pressed
+			//sets toFire flag to 1
+			if(in == 'a') 
+				toFire = 1;
+			
+			//code to check if Reload button pressed
+			//sets toReload flag to 1
+			//maybe introduce a delay between reloading and firing?
+			if(in == 's')
+				toReload = 1;
+			
+			//code to check if Receiving IR Info
+			//sets toDamage flag to 1
+			if(in == 'd')
+				toDamage = 1;
 		
-		//code to check if Reload button pressed
-		//sets toReload flag to 1
-		//maybe introduce a delay between reloading and firing?
-		if(in == 's')
-			toReload = 1;
+	  }
 		
-		//code to check if Receiving IR Info
-		//sets toDamage flag to 1
-		if(in == 'd')
-			toDamage = 1;
+		if(in == 'q') {
+			thisGame.status = 0;
+			LCD_Clear(White);
+		}
+		
+		if(in == 'w') {
+			thisGame.status = 1;
+		}
+		
+		if(in == 'e') {
+			pInit(&thisPlayer);
+			thisGame.status = 2;
+			updateDisplay(&thisPlayer);
+		}
 		
 		//fire / reload should be if else if so as to only allow one at a time
 	}
@@ -100,7 +118,7 @@ void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
   static unsigned long ticks;
 
   // (1) Set clock_1s to 1 every 1 second;
-  if (ticks++ >= 99) { 
+  if (ticks++ >= 30) { 
     ticks    = 0;
 		switch(thisGame.status) {
 			case 0:
@@ -110,11 +128,9 @@ void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
 				waiting();
 				break;
 		}
-  } else if (thisGame.status == 2 && ticks++ >= 10) {
-		testIRQ();
-		ticks = 0;
 	}
-
+	
+	testIRQ();
 } 
 
 int main (void) {
@@ -128,12 +144,12 @@ int main (void) {
 	UARTInit(0, 9600);
 	UARTSend(0, (uint8_t *) "Made it here", 12);
 	
-	gInit(&thisGame, &thisPlayer);
+	gInit(&thisGame);
 	addGame("test game", "1/8");
 	addGame("test game2", "2/8");
 	addGame("test game3", "3/8");
 	addGame("test game4", "4/8");
-	thisGame.status = 2;
+	thisGame.status = 0;
 	
 	// (2) Timer 0 configuration;
   LPC_SC->PCONP |= 1 << 1; // Power up Timer 0 
@@ -188,8 +204,10 @@ int main (void) {
 				/* handle death logic here
 					 might want to just end this player's game */
 				thisPlayer.lives--;
-				if(thisPlayer.lives == 0)
+				if(thisPlayer.lives == 0) {
 					thisGame.status = 0;
+					LCD_Clear(White);
+				}
 				else
 					thisPlayer.health = 10;
 			}
