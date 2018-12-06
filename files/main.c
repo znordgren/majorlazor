@@ -32,14 +32,26 @@ void delay( uint32_t del)
 }
 
 
-char displayResponse() {
+char displayResponse2() {
 	char rtn = 'o';	
 	if(UART0_Count != 0) {
 			LPC_UART0->IER = IER_THRE | IER_RLS; // Disable RBR
-			UARTSend(0, (uint8_t *)(UART0_Buffer), UART0_Count );
+			UARTSend(2, (uint8_t *)(UART0_Buffer), UART0_Count );
 			rtn = UART0_Buffer[0];
 			UART0_Count = 0;
 			LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
+	}
+	return rtn;
+} 
+
+char displayResponse() {
+	char rtn = 'o';	
+	if(UART2_Count != 0) {
+			LPC_UART2->IER = IER_THRE | IER_RLS; // Disable RBR
+			UARTSend(0, (uint8_t *)(UART2_Buffer), UART2_Count );
+			rtn = UART2_Buffer[0];
+			UART2_Count = 0;
+			LPC_UART2->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
 	}
 	return rtn;
 } 
@@ -64,13 +76,14 @@ char displayResponse() {
 } */
 
 void testIRQ(void) {
-	char in;
+	char in, in2;
 	
 	if ( (LPC_TIM0->IR & 0x01) == 0x01 ) // if MR0 interrupt (this is a sanity check);
   {		
 		LPC_TIM0->IR |= 1 << 0; // Clear MR0 interrupt flag  
 		//temp way of handling input
 		in = displayResponse();
+		in2 = displayResponse2();
 		
 		if(thisGame.status == 2) {
 			//code to check if Fire button pressed
@@ -86,7 +99,7 @@ void testIRQ(void) {
 			
 			//code to check if Receiving IR Info
 			//sets toDamage flag to 1
-			if(in == 'd')
+			if(in == 'd' || in2 == 'd')
 				toDamage = 1;
 		
 	  }
@@ -142,7 +155,8 @@ int main (void) {
 	LCD_Clear(White);
 	SysTick_Config(SystemCoreClock/100);
 	UARTInit(0, 9600);
-	UARTSend(0, (uint8_t *) "Made it here", 12);
+	UARTInit(2, 9600);
+	UARTSend(2, (uint8_t *) "Made it here", 12);
 	
 	gInit(&thisGame);
 	addGame("test game", "1/8");
@@ -163,7 +177,7 @@ int main (void) {
 	
 	LPC_TIM0->TCR |= 1 << 0; 
 	
-	UARTSend(0, (uint8_t *) "Made it here2", 13);
+	UARTSend(2, (uint8_t *) "Made it here2", 13);
 	
   //NVIC_EnableIRQ(TIMER0_IRQn);
 
