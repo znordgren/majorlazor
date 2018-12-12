@@ -216,7 +216,7 @@ uint32_t UARTInit( uint32_t PortNum, uint32_t baudrate )
     LPC_UART0->DLL = Fdiv % 256;
     LPC_UART0->LCR = 0x03;    /* DLAB = 0 */
     LPC_UART0->FCR = 0x07;    /* Enable and reset TX and RX FIFO. */
-
+		
     // (3) enable;
     NVIC_EnableIRQ(UART0_IRQn);
 
