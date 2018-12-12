@@ -36,12 +36,11 @@ void delay( uint32_t del)
     temp = i;
 }
 
-
-char displayResponse2() {
+/*
+char displayResponse0() {
 	char rtn = 'o';	
 	if(UART0_Count != 0) {
 			LPC_UART0->IER = IER_THRE | IER_RLS; // Disable RBR
-			UARTSend(2, (uint8_t *)(UART0_Buffer), UART0_Count );
 			rtn = UART0_Buffer[0];
 			UART0_Count = 0;
 			LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
@@ -49,18 +48,17 @@ char displayResponse2() {
 	return rtn;
 } 
 
-char displayResponse() {
+char displayResponse2() {
 	char rtn = 'o';	
 	if(UART2_Count != 0) {
 			LPC_UART2->IER = IER_THRE | IER_RLS; // Disable RBR
-			UARTSend(0, (uint8_t *)(UART2_Buffer), UART2_Count );
 			rtn = UART2_Buffer[0];
 			UART2_Count = 0;
 			LPC_UART2->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
 	}
 	return rtn;
 } 
-
+*/
 /*void search(char *msg, int size) {
 	int i;
 	char mg[3];
@@ -79,55 +77,50 @@ char displayResponse() {
 	sprintf(mg, "r:%d", mk);
 	GLCD_DisplayString(3, 0, mg);
 } */
-
+/*
 void testIRQ(void) {
-	char in, in2;
-	
-	if ( (LPC_TIM0->IR & 0x01) == 0x01 ) // if MR0 interrupt (this is a sanity check);
-  {		
-		LPC_TIM0->IR |= 1 << 0; // Clear MR0 interrupt flag  
+	char in0, in2;
 		//temp way of handling input
-		in = displayResponse();
+		in0 = displayResponse0();
 		in2 = displayResponse2();
 		
 		if(thisGame.status == 2) {
 			//code to check if Fire button pressed
 			//sets toFire flag to 1
-			if(in == 'a') 
+			if(in2 == 'a') 
 				toFire = 1;
 			
 			//code to check if Reload button pressed
 			//sets toReload flag to 1
 			//maybe introduce a delay between reloading and firing?
-			if(in == 's')
+			if(in2 == 's')
 				toReload = 1;
 			
 			//code to check if Receiving IR Info
 			//sets toDamage flag to 1
-			if(in == 'd' || in2 == 'd')
+			if(in0 == 'd')
 				toDamage = 1;
 		
 	  }
 		
-		if(in == 'q') {
+		if(in0 == 'q') {
 			thisGame.status = 0;
 			LCD_Clear(White);
 		}
 		
-		if(in == 'w') {
+		if(in0 == 'w') {
 			thisGame.status = 1;
 		}
 		
-		if(in == 'e') {
+		if(in0 == 'e') {
 			pInit(&thisPlayer);
 			thisGame.status = 2;
 			updateDisplay(&thisPlayer);
 		}
 		
 		//fire / reload should be if else if so as to only allow one at a time
-	}
 }
-
+*/
 /*----------------------------------------------------------------------------
   SysTick IRQ: Executed periodically
  *----------------------------------------------------------------------------*/
@@ -148,7 +141,7 @@ void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
 		}
 	}
 	
-	testIRQ();
+	//testIRQ();
 } 
 
 int main (void) {
@@ -182,7 +175,7 @@ int main (void) {
 	
 	LPC_TIM0->TCR |= 1 << 0; 
 	
-	UARTSend(2, (uint8_t *) "Made it here2", 13);
+	UARTSend(2, (uint8_t *) "Made it update", 13);
 	
 	//Enable PWM
 	LPC_PINCON->PINSEL3 |= ( 1 << 5 );  // Bit 5 P1.18 set for PWM1.1
@@ -216,7 +209,7 @@ int main (void) {
 			if(toFire) {
 				if(thisPlayer.ammo > 0) {
 					
-					UARTSend(0, (uint8_t *)('a'), 1 );
+					UARTSend(0, (uint8_t *)('d'), 1 );
 					// IR send here
 					thisPlayer.ammo--;
 					updateDisplay(&thisPlayer);
