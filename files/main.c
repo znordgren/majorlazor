@@ -11,10 +11,9 @@
 #include "LED.h"                                /* LED function prototypes */
 #include "uart.h"
 #include "game.h"
-#include "pwm.h"
 
 
-#define CYCLE_TIME 442
+#define CYCLE_TIME 445
 #define SBIT_CNTEN 0 
 #define SBIT_PWMEN 2
 
@@ -186,13 +185,12 @@ int main (void) {
 	UARTSend(2, (uint8_t *) "Made it here2", 13);
 	
 	//Enable PWM
-	PWM_Init(CYCLE_TIME);
-	PWM_Start(PWM_1);
-
-	LPC_PINCON->PINSEL3 |= ( 1 << 5 );  // Bit 6 P1.18 set for PWM1.1
-	LPC_PWM1->TCR = (1<<SBIT_CNTEN) | (1<<SBIT_PWMEN);
-	LPC_PWM1->MR0 = CYCLE_TIME;                /* set PWM cycle(Ton+Toff)=100) */
-	LPC_PWM1->MR1 = CYCLE_TIME/3; 
+	LPC_PINCON->PINSEL3 |= ( 1 << 5 );  // Bit 5 P1.18 set for PWM1.1
+	LPC_PWM1->PR = 0x0;        // count frequency:Fpclk
+	LPC_PWM1->MCR = 3;         // interrupt on PWMMR0, reset on PWMMR0, reset TC if PWM matches
+	LPC_PWM1->TCR = (1<<SBIT_CNTEN) | (1<<SBIT_PWMEN);  // Enable Counters,PWM module
+	LPC_PWM1->MR0 = CYCLE_TIME;                // set PWM cycle(Ton+Toff)=100)
+	LPC_PWM1->MR1 = CYCLE_TIME/3;              //
 	LPC_PWM1->LER = 1;
 	LPC_PWM1->PCR = 1<<9;
 	
@@ -218,7 +216,7 @@ int main (void) {
 			if(toFire) {
 				if(thisPlayer.ammo > 0) {
 					
-					
+					UARTSend(0, (uint8_t *)('a'), 1 );
 					// IR send here
 					thisPlayer.ammo--;
 					updateDisplay(&thisPlayer);
