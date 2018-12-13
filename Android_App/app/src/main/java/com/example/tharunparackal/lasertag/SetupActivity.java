@@ -2,6 +2,7 @@ package com.example.tharunparackal.lasertag;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,13 +52,13 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
         sharedPreferences = getSharedPreferences("HTTP_HELPER_PREFS", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         colorSpinner = (Spinner) findViewById(R.id.spinner);
+        colorSpinner.setOnItemSelectedListener(this);
         ArrayAdapter<CharSequence> colorAdapter = ArrayAdapter.createFromResource(this,R.array.colors, android.R.layout.simple_spinner_item);
         colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         colorSpinner.setAdapter(colorAdapter);
-        colorSpinner.setOnItemSelectedListener(this);
         buttonSend = (Button) findViewById(R.id.buttonSend);
         buttonSend.setPadding(0, 0, 0, 0);
-        buttonSend.setTextColor(Color.parseColor("#7f3c3c"));
+        buttonSend.setTextColor(Color.parseColor("#000000"));
         buttonSend.setOnClickListener(this);
         editTextIPAddress = (EditText) findViewById(R.id.editTextIPAddress);
         editTextPortNumber = (EditText) findViewById(R.id.editTextPortNumber);
@@ -73,7 +74,7 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
     @Override
     public void onNothingSelected(AdapterView<?> parent)
     {
-
+//        colorText = "Red";
     }
     public void onClick(View v) // do something when a button is clicked
     {
@@ -86,7 +87,7 @@ public class SetupActivity extends AppCompatActivity implements AdapterView.OnIt
             // get the port number
             String portNumber = editTextPortNumber.getText().toString().trim();
             // get the team color
-            //colorText = colorSpinner.getSelectedItem().toString();
+            colorText = (String) colorSpinner.getSelectedItem().toString();
 
             // save the IP address and port for the next time the app is used
             editor.putString(PREF_IP, ipAddress); // set the ip address value to save

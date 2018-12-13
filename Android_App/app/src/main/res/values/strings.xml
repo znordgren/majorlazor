@@ -11,6 +11,8 @@
     <string name="_192_168_0_10">192.168.0.10</string>
     <string name="port_number">Port Number</string>
     <string name="_80">80</string>
+    <string name="red_team">Red Team</string>
+    <string name="blue_team">Blue Team</string>
     <string-array name = "colors">
         <item>Red</item>
         <item>Blue</item>
