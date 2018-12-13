@@ -1,14 +1,17 @@
 package com.example.tharunparackal.lasertag;
 
 import android.app.Activity;
-import android.widget.Button;
 //import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.content.Intent;
+import android.widget.Button;
+
 
 public class MainActivity extends Activity
 {
+    public Button buttonSetup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -22,9 +25,7 @@ public class MainActivity extends Activity
         {
             case R.id.buttonSetup:
                 startActivity(new Intent(getApplicationContext(), SetupActivity.class)); // starts setup activity
-            case R.id.buttonStartGame:
 
-            case R.id.buttonStats:
         }
     }
 }

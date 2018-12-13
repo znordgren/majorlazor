@@ -6,30 +6,22 @@
     <string name="go_back">Go Back</string>
     <string name="player_count">Player Count</string>
     <string name="stats">Stats</string>
+    <string name="send">Send</string>
+    <string name="ip_address">IP Address</string>
+    <string name="_192_168_0_10">192.168.0.10</string>
+    <string name="port_number">Port Number</string>
+    <string name="_80">80</string>
     <string-array name = "colors">
         <item>Red</item>
         <item>Blue</item>
         <item>Yellow</item>
         <item>Black</item>
         <item>Navy</item>
-        <item>DarkGreen</item>
-        <item>DarkCyan</item>
         <item>Maroon</item>
-        <item>Purple</item>
         <item>Olive</item>
         <item>Grey</item>
-        <item>LightGrey</item>
-        <item>DarkGrey</item>
         <item>Green</item>
-        <item>Cyan</item>
-        <item>Magenta</item>
         <item>White</item>
     </string-array>
 
-    <string-array name = "numPlayers">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
 </resources>
