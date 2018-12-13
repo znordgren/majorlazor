@@ -22,6 +22,7 @@ Game thisGame;
 int toFire;
 int toReload;
 int toDamage;
+int team;
 
 extern volatile uint32_t UART0_Count;
 extern volatile uint8_t UART0_Buffer[BUFSIZE];
@@ -36,11 +37,12 @@ void delay( uint32_t del)
     temp = i;
 }
 
-/*
+
 char displayResponse0() {
 	char rtn = 'o';	
 	if(UART0_Count != 0) {
 			LPC_UART0->IER = IER_THRE | IER_RLS; // Disable RBR
+			//UARTSend(0, (uint8_t *) UART0_Buffer, UART0_Count);
 			rtn = UART0_Buffer[0];
 			UART0_Count = 0;
 			LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
@@ -52,13 +54,15 @@ char displayResponse2() {
 	char rtn = 'o';	
 	if(UART2_Count != 0) {
 			LPC_UART2->IER = IER_THRE | IER_RLS; // Disable RBR
-			rtn = UART2_Buffer[0];
+			UARTSend(0, (uint8_t *) UART2_Buffer, UART2_Count);
+			if(UART2_Buffer[0] != '0'+(char)team)
+				rtn = UART2_Buffer[1];
 			UART2_Count = 0;
 			LPC_UART2->IER = IER_THRE | IER_RLS | IER_RBR; // Re-enable RBR
 	}
 	return rtn;
 } 
-*/
+
 /*void search(char *msg, int size) {
 	int i;
 	char mg[3];
@@ -77,7 +81,7 @@ char displayResponse2() {
 	sprintf(mg, "r:%d", mk);
 	GLCD_DisplayString(3, 0, mg);
 } */
-/*
+
 void testIRQ(void) {
 	char in0, in2;
 		//temp way of handling input
@@ -87,18 +91,18 @@ void testIRQ(void) {
 		if(thisGame.status == 2) {
 			//code to check if Fire button pressed
 			//sets toFire flag to 1
-			if(in2 == 'a') 
+			if(in0 == 'a') 
 				toFire = 1;
 			
 			//code to check if Reload button pressed
 			//sets toReload flag to 1
 			//maybe introduce a delay between reloading and firing?
-			if(in2 == 's')
+			if(in0 == 's')
 				toReload = 1;
 			
 			//code to check if Receiving IR Info
 			//sets toDamage flag to 1
-			if(in0 == 'd')
+			if(in2 == 'd')
 				toDamage = 1;
 		
 	  }
@@ -120,7 +124,7 @@ void testIRQ(void) {
 		
 		//fire / reload should be if else if so as to only allow one at a time
 }
-*/
+
 /*----------------------------------------------------------------------------
   SysTick IRQ: Executed periodically
  *----------------------------------------------------------------------------*/
@@ -141,27 +145,29 @@ void SysTick_Handler (void) // SysTick Interrupt Handler (10ms);
 		}
 	}
 	
-	//testIRQ();
+	testIRQ();
 } 
 
 int main (void) {
 	//char test[12];
+	char in2;
+	team = 1;
 	
 	SystemInit();
 	
 	LCD_Initialization();
 	LCD_Clear(White);
 	SysTick_Config(SystemCoreClock/100);
-	UARTInit(0, 9600);
-	UARTInit(2, 9600);
-	UARTSend(2, (uint8_t *) "Made it here", 12);
+	UARTInit(0, 4800);
+	UARTInit(2, 4800);
+	UARTSend(0, (uint8_t *) "Made it here", 12);
 	
 	gInit(&thisGame);
 	addGame("test game", "1/8");
 	addGame("test game2", "2/8");
 	addGame("test game3", "3/8");
 	addGame("test game4", "4/8");
-	thisGame.status = 0;
+	thisGame.status = 1;
 	
 	// (2) Timer 0 configuration;
   LPC_SC->PCONP |= 1 << 1; // Power up Timer 0 
@@ -175,7 +181,7 @@ int main (void) {
 	
 	LPC_TIM0->TCR |= 1 << 0; 
 	
-	UARTSend(2, (uint8_t *) "Made it update", 13);
+	UARTSend(0, (uint8_t *) "Made it update", 13);
 	
 	//Enable PWM
 	LPC_PINCON->PINSEL3 |= ( 1 << 5 );  // Bit 5 P1.18 set for PWM1.1
@@ -190,6 +196,7 @@ int main (void) {
 	//LPC_PWM1->MR0 = 50;
 	//LPC_PWM1->MR1 = 30;
 	//LPC_PWM1->PCR |= (1 << 9); //Bit 9 enables PWM1
+	
 	
 	
   //NVIC_EnableIRQ(TIMER0_IRQn);
@@ -209,7 +216,7 @@ int main (void) {
 			if(toFire) {
 				if(thisPlayer.ammo > 0) {
 					
-					UARTSend(0, (uint8_t *)('d'), 1 );
+					UARTSend(2, (uint8_t *)"1d", 2);
 					// IR send here
 					thisPlayer.ammo--;
 					updateDisplay(&thisPlayer);
@@ -223,6 +230,8 @@ int main (void) {
 				updateDisplay(&thisPlayer);
 			}
 			
+			//in2 = displayResponse2();
+			
 			if(toDamage) {
 				thisPlayer.health -= 5;
 				toDamage = 0;
@@ -234,11 +243,13 @@ int main (void) {
 					 might want to just end this player's game */
 				thisPlayer.lives--;
 				if(thisPlayer.lives == 0) {
-					thisGame.status = 0;
+					thisGame.status = 1;
 					LCD_Clear(White);
 				}
-				else
-					thisPlayer.health = 10;
+				else {
+					thisPlayer.health = 15;
+					updateDisplay(&thisPlayer);
+				}
 			}
 			
 		}

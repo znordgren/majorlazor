@@ -22,8 +22,8 @@ void reload(Player *p) {
 }
 
 void pInit(Player *p) {
-	p->health = 10;
-	p->lives = 1;
+	p->health = 15;
+	p->lives = 5;
 	p->ammo = 10;
 }
 
