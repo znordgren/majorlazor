@@ -189,9 +189,9 @@ int main (void) {
 	LPC_PWM1->MCR = 3;         // interrupt on PWMMR0, reset on PWMMR0, reset TC if PWM matches
 	LPC_PWM1->TCR = (1<<SBIT_CNTEN) | (1<<SBIT_PWMEN);  // Enable Counters,PWM module
 	LPC_PWM1->MR0 = CYCLE_TIME;                // set PWM cycle(Ton+Toff)=100)
-	LPC_PWM1->MR1 = CYCLE_TIME/3;              //
-	LPC_PWM1->LER = 1;
-	LPC_PWM1->PCR = 1<<9;
+	LPC_PWM1->MR1 = CYCLE_TIME/3;              // set 33% duty cycle
+	LPC_PWM1->LER = 1;			   // Reset Latch
+	LPC_PWM1->PCR = 1<<9;			   // Start PWM1.1
 	
 	//LPC_PWM1->MR0 = 50;
 	//LPC_PWM1->MR1 = 30;
